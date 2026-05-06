@@ -1,7 +1,7 @@
-import Main from "@/components/Main";
+import JobPage from "@/components/JobPage";
 
-const MainPage = () => {
-  return <Main />;
+const Main = () => {
+  return <JobPage />;
 };
 
-export default MainPage;
+export default Main;
