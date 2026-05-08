@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import JobModal from "./JobModal";
 import JobItem from "./JobItem";
-import { Job } from "./types";
+import StatusFilter from "./StatusFilter";
+import { Job, JobStatus } from "./types";
 
 const JobPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
+    "Todos",
+  );
 
   useEffect(() => {
     const savedJobs = localStorage.getItem("jobs");
@@ -95,6 +99,11 @@ const JobPage = () => {
     event.target.value = "";
   };
 
+  const filteredJobs =
+    filterStatus === "Todos"
+      ? jobs
+      : jobs.filter((job) => job.status === filterStatus);
+
   return (
     <main className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
@@ -127,6 +136,11 @@ const JobPage = () => {
           </div>
         </div>
 
+        <StatusFilter
+          currentStatus={filterStatus}
+          onStatusChange={setFilterStatus}
+        />
+
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
             <thead className="bg-gray-100 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
@@ -155,8 +169,8 @@ const JobPage = () => {
               </tr>
             </thead>
             <tbody>
-              {jobs.length > 0 ? (
-                jobs.map((job) => (
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((job) => (
                   <JobItem
                     key={job.id}
                     job={job}
@@ -170,7 +184,9 @@ const JobPage = () => {
                     colSpan={7}
                     className="px-6 py-8 text-center text-gray-500"
                   >
-                    Nenhuma vaga adicionada ainda.
+                    {jobs.length === 0
+                      ? "Nenhuma vaga adicionada ainda."
+                      : "Nenhuma vaga encontrada com este status."}
                   </td>
                 </tr>
               )}
