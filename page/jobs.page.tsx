@@ -1,11 +1,12 @@
 "use client";
 
-import clsx from "clsx";
 import JobItem from "./components/JobItem";
 import { useEffect, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
 import StatusFilter from "./components/StatusFilter";
 import JobModal from "./components/JobModal";
+
+import Button from "@/components/Button";
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -113,14 +114,7 @@ const JobsPage = () => {
             Job Track
           </h1>
           <div className="flex flex-wrap gap-2">
-            <label
-              className={clsx(
-                "inline-flex cursor-pointer items-center rounded-lg border",
-                "border-gray-300 bg-white px-4 py-2 text-sm font-medium",
-                "text-gray-700 hover:bg-gray-50 dark:border-gray-600",
-                "dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
-              )}
-            >
+            <Button variant="secondary" as="label">
               Importar JSON
               <input
                 type="file"
@@ -128,28 +122,11 @@ const JobsPage = () => {
                 onChange={handleImport}
                 className="hidden"
               />
-            </label>
-            <button
-              onClick={handleExport}
-              className={clsx(
-                "inline-flex items-center rounded-lg border border-gray-300 bg-white",
-                "px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50",
-                "dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300",
-                "dark:hover:bg-gray-700",
-              )}
-            >
+            </Button>
+            <Button onClick={handleExport} variant="secondary">
               Exportar JSON
-            </button>
-            <button
-              onClick={openAddModal}
-              className={clsx(
-                "rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white",
-                "hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300",
-                "dark:focus:ring-blue-800",
-              )}
-            >
-              Adicionar nova vaga
-            </button>
+            </Button>
+            <Button onClick={openAddModal}>Adicionar nova vaga</Button>
           </div>
         </div>
 
