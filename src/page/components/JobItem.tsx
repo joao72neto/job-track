@@ -1,6 +1,7 @@
 import React from "react";
 import { Job } from "../jobs.types";
 import { clsx } from "clsx";
+import { HiExternalLink, HiPencil, HiTrash } from "react-icons/hi";
 
 interface JobItemProps {
   job: Job;
@@ -22,7 +23,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
     <tr
       className={clsx(
         "border-b bg-white hover:bg-gray-50",
-        "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600",
+        "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-white/10",
       )}
     >
       <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
@@ -46,19 +47,34 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
           {job.notes}
         </div>
       </td>
-      <td className="px-6 py-4 text-right">
-        <button
-          onClick={() => onEdit(job)}
-          className="mr-3 font-medium text-blue-600 hover:underline dark:text-blue-500"
-        >
-          Editar
-        </button>
-        <button
-          onClick={() => onDelete(job.id)}
-          className="font-medium text-red-600 hover:underline dark:text-red-500"
-        >
-          Excluir
-        </button>
+      <td className="px-6 py-4">
+        <div className="flex justify-end space-x-3">
+          {job.link && (
+            <a
+              href={job.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+              title="Ver vaga"
+            >
+              <HiExternalLink size={20} />
+            </a>
+          )}
+          <button
+            onClick={() => onEdit(job)}
+            className="cursor-pointer text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400"
+            title="Editar"
+          >
+            <HiPencil size={20} />
+          </button>
+          <button
+            onClick={() => onDelete(job.id)}
+            className="cursor-pointer text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400"
+            title="Excluir"
+          >
+            <HiTrash size={20} />
+          </button>
+        </div>
       </td>
     </tr>
   );

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
 import StatusFilter from "./components/StatusFilter";
 import JobModal from "./components/JobModal";
+import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 
@@ -126,7 +127,12 @@ const JobsPage = () => {
             <Button onClick={handleExport} variant="secondary">
               Exportar JSON
             </Button>
-            <Button onClick={openAddModal}>Adicionar nova vaga</Button>
+            <Button onClick={openAddModal}>
+              <div className="flex items-center gap-2">
+                <HiPlus size={20} />
+                <span>Adicionar nova vaga</span>
+              </div>
+            </Button>
           </div>
         </div>
 

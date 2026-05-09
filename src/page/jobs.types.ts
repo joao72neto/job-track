@@ -12,4 +12,5 @@ export interface Job {
   date: string;
   status: JobStatus;
   notes: string;
+  link?: string;
 }

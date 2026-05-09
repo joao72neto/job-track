@@ -23,6 +23,7 @@ const JobModal: React.FC<JobModalProps> = ({
     date: new Date().toISOString().split("T")[0],
     status: "Aplicado",
     notes: "",
+    link: "",
   });
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const JobModal: React.FC<JobModalProps> = ({
         date: editingJob.date,
         status: editingJob.status,
         notes: editingJob.notes,
+        link: editingJob.link || "",
       });
     } else {
       setFormData({
@@ -43,6 +45,7 @@ const JobModal: React.FC<JobModalProps> = ({
         date: new Date().toISOString().split("T")[0],
         status: "Aplicado",
         notes: "",
+        link: "",
       });
     }
   }, [editingJob, isOpen]);
@@ -110,6 +113,14 @@ const JobModal: React.FC<JobModalProps> = ({
               onChange={handleChange}
             />
           </div>
+          <Input
+            label="Link da vaga"
+            type="url"
+            name="link"
+            value={formData.link}
+            onChange={handleChange}
+            placeholder="https://..."
+          />
           <Input
             label="Status"
             as="select"
