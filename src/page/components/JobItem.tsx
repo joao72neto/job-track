@@ -22,7 +22,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
   return (
     <tr
       className={clsx(
-        "border-b bg-white hover:bg-gray-50",
+        "border-b bg-white hover:bg-gray-50 cursor-default",
         "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-white/10",
       )}
     >
@@ -43,7 +43,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
         </span>
       </td>
       <td className="px-6 py-4">
-        <div className="max-w-xs truncate" title={job.notes}>
+        <div className="max-w-50 truncate" title={job.notes}>
           {job.notes}
         </div>
       </td>
