@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Job } from "../jobs.types";
-import { clsx } from "clsx";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
 
 interface JobModalProps {
   isOpen: boolean;
@@ -23,12 +24,6 @@ const JobModal: React.FC<JobModalProps> = ({
     status: "Aplicado",
     notes: "",
   });
-
-  const inputClasses = clsx(
-    "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm",
-    "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-    "dark:border-gray-600 dark:bg-gray-700 dark:text-white",
-  );
 
   useEffect(() => {
     if (editingJob) {
@@ -79,110 +74,66 @@ const JobModal: React.FC<JobModalProps> = ({
           {editingJob ? "Editar Vaga" : "Adicionar Nova Vaga"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Empresa
-            </label>
-            <input
-              required
-              type="text"
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              className={inputClasses}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Vaga
-            </label>
-            <input
-              required
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              placeholder="Ex: Front Junior, Fullstack..."
-              className={inputClasses}
-            />
-          </div>
+          <Input
+            required
+            label="Empresa"
+            type="text"
+            name="company"
+            value={formData.company}
+            onChange={handleChange}
+          />
+          <Input
+            required
+            label="Vaga"
+            type="text"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            placeholder="Ex: Front Junior, Fullstack..."
+          />
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Plataforma
-              </label>
-              <input
-                required
-                type="text"
-                name="platform"
-                value={formData.platform}
-                onChange={handleChange}
-                placeholder="Ex: LinkedIn, Nerdin..."
-                className={inputClasses}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Data
-              </label>
-              <input
-                required
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className={inputClasses}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
+            <Input
+              required
+              label="Plataforma"
+              type="text"
+              name="platform"
+              value={formData.platform}
               onChange={handleChange}
-              className={inputClasses}
-            >
-              <option value="Aplicado">Aplicado</option>
-              <option value="Entrevista">Entrevista</option>
-              <option value="Rejeitado">Rejeitado</option>
-              <option value="Sem resposta">Sem resposta</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Observações
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
+              placeholder="Ex: LinkedIn, Nerdin..."
+            />
+            <Input
+              required
+              label="Data"
+              type="date"
+              name="date"
+              value={formData.date}
               onChange={handleChange}
-              rows={3}
-              className={inputClasses}
             />
           </div>
+          <Input
+            label="Status"
+            as="select"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+          >
+            <option value="Aplicado">Aplicado</option>
+            <option value="Entrevista">Entrevista</option>
+            <option value="Rejeitado">Rejeitado</option>
+            <option value="Sem resposta">Sem resposta</option>
+          </Input>
+          <Input
+            label="Observações"
+            as="textarea"
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+          />
           <div className="mt-6 flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className={clsx(
-                "rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700",
-                "hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
-              )}
-            >
+            <Button type="button" variant="secondary" onClick={onClose}>
               Cancelar
-            </button>
-            <button
-              type="submit"
-              className={clsx(
-                "rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white",
-                "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-              )}
-            >
-              Salvar
-            </button>
+            </Button>
+            <Button type="submit">Salvar</Button>
           </div>
         </form>
       </div>
