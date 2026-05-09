@@ -1,5 +1,6 @@
 import React from "react";
 import { JobStatus } from "./types";
+import { clsx } from "clsx";
 
 interface StatusFilterProps {
   currentStatus: JobStatus | "Todos";
@@ -24,11 +25,16 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         <button
           key={status}
           onClick={() => onStatusChange(status)}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
+          className={clsx(
+            "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
             currentStatus === status
               ? "bg-blue-600 text-white"
-              : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-          }`}
+              : [
+                  "bg-white text-gray-700 hover:bg-gray-100",
+                  "dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
+                  "border border-gray-300 dark:border-gray-600",
+                ],
+          )}
         >
           {status}
         </button>

@@ -5,6 +5,7 @@ import JobModal from "./JobModal";
 import JobItem from "./JobItem";
 import StatusFilter from "./StatusFilter";
 import { Job, JobStatus } from "./types";
+import clsx from "clsx";
 
 const JobPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -112,7 +113,14 @@ const JobPage = () => {
             Job Track
           </h1>
           <div className="flex flex-wrap gap-2">
-            <label className="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+            <label
+              className={clsx(
+                "inline-flex cursor-pointer items-center rounded-lg border",
+                "border-gray-300 bg-white px-4 py-2 text-sm font-medium",
+                "text-gray-700 hover:bg-gray-50 dark:border-gray-600",
+                "dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
+              )}
+            >
               Importar JSON
               <input
                 type="file"
@@ -123,13 +131,22 @@ const JobPage = () => {
             </label>
             <button
               onClick={handleExport}
-              className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              className={clsx(
+                "inline-flex items-center rounded-lg border border-gray-300 bg-white",
+                "px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50",
+                "dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300",
+                "dark:hover:bg-gray-700",
+              )}
             >
               Exportar JSON
             </button>
             <button
               onClick={openAddModal}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800"
+              className={clsx(
+                "rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white",
+                "hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300",
+                "dark:focus:ring-blue-800",
+              )}
             >
               Adicionar nova vaga
             </button>

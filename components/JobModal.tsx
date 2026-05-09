@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Job } from "./types";
+import { clsx } from "clsx";
 
 interface JobModalProps {
   isOpen: boolean;
@@ -22,6 +23,12 @@ const JobModal: React.FC<JobModalProps> = ({
     status: "Aplicado",
     notes: "",
   });
+
+  const inputClasses = clsx(
+    "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm",
+    "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+    "dark:border-gray-600 dark:bg-gray-700 dark:text-white",
+  );
 
   useEffect(() => {
     if (editingJob) {
@@ -82,7 +89,7 @@ const JobModal: React.FC<JobModalProps> = ({
               name="company"
               value={formData.company}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className={inputClasses}
             />
           </div>
           <div>
@@ -96,7 +103,7 @@ const JobModal: React.FC<JobModalProps> = ({
               value={formData.role}
               onChange={handleChange}
               placeholder="Ex: Front Junior, Fullstack..."
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className={inputClasses}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -111,7 +118,7 @@ const JobModal: React.FC<JobModalProps> = ({
                 value={formData.platform}
                 onChange={handleChange}
                 placeholder="Ex: LinkedIn, Nerdin..."
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className={inputClasses}
               />
             </div>
             <div>
@@ -124,7 +131,7 @@ const JobModal: React.FC<JobModalProps> = ({
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -136,7 +143,7 @@ const JobModal: React.FC<JobModalProps> = ({
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className={inputClasses}
             >
               <option value="Aplicado">Aplicado</option>
               <option value="Entrevista">Entrevista</option>
@@ -153,20 +160,26 @@ const JobModal: React.FC<JobModalProps> = ({
               value={formData.notes}
               onChange={handleChange}
               rows={3}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className={inputClasses}
             />
           </div>
           <div className="mt-6 flex justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              className={clsx(
+                "rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700",
+                "hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
+              )}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className={clsx(
+                "rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white",
+                "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+              )}
             >
               Salvar
             </button>

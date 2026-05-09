@@ -1,5 +1,6 @@
 import React from "react";
 import { Job } from "./types";
+import { clsx } from "clsx";
 
 interface JobItemProps {
   job: Job;
@@ -18,7 +19,12 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
   };
 
   return (
-    <tr className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
+    <tr
+      className={clsx(
+        "border-b bg-white hover:bg-gray-50",
+        "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600",
+      )}
+    >
       <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
         {job.company}
       </td>
@@ -27,7 +33,10 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
       <td className="px-6 py-4">{job.date}</td>
       <td className="px-6 py-4">
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[job.status]}`}
+          className={clsx(
+            "rounded-full px-2.5 py-0.5 text-xs font-medium",
+            statusColors[job.status],
+          )}
         >
           {job.status}
         </span>
