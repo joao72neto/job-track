@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Job } from "../jobs.types";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
+import Input from "@/src/components/Input";
+import Button from "@/src/components/Button";
 
 interface JobModalProps {
   isOpen: boolean;

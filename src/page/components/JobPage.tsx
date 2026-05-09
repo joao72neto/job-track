@@ -5,7 +5,7 @@ import JobModal from "./JobModal";
 import JobItem from "./JobItem";
 import StatusFilter from "./StatusFilter";
 import { Job, JobStatus } from "../jobs.types";
-import Button from "@/components/Button";
+import Button from "@/src/components/Button";
 
 const JobPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
