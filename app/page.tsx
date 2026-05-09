@@ -1,7 +1,7 @@
-import JobPage from "@/components/JobPage";
+import JobsPage from "@/page/jobs.page";
 
 const Main = () => {
-  return <JobPage />;
+  return <JobsPage />;
 };
 
 export default Main;

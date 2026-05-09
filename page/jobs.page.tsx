@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import JobModal from "./JobModal";
-import JobItem from "./JobItem";
-import StatusFilter from "./StatusFilter";
-import { Job, JobStatus } from "./types";
 import clsx from "clsx";
+import JobItem from "./components/JobItem";
+import { useEffect, useState } from "react";
+import { Job, JobStatus } from "./jobs.types";
+import StatusFilter from "./components/StatusFilter";
+import JobModal from "./components/JobModal";
 
-const JobPage = () => {
+const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -222,4 +222,4 @@ const JobPage = () => {
   );
 };
 
-export default JobPage;
+export default JobsPage;

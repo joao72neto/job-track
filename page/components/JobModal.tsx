@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Job } from "./types";
+import { Job } from "../jobs.types";
 import { clsx } from "clsx";
 
 interface JobModalProps {

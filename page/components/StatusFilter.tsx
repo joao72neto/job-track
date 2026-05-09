@@ -1,5 +1,5 @@
 import React from "react";
-import { JobStatus } from "./types";
+import { JobStatus } from "../jobs.types";
 import { clsx } from "clsx";
 
 interface StatusFilterProps {
