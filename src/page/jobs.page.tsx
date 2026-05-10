@@ -4,6 +4,7 @@ import JobItem from "./components/JobItem";
 import { useEffect, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
 import StatusFilter from "./components/StatusFilter";
+import SearchBar from "./components/SearchBar";
 import JobModal from "./components/JobModal";
 import JobViewModal from "./components/JobViewModal";
 import { HiPlus } from "react-icons/hi";
@@ -19,6 +20,7 @@ const JobsPage = () => {
   const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
     "Todos",
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const savedJobs = localStorage.getItem("jobs");
@@ -110,15 +112,19 @@ const JobsPage = () => {
     event.target.value = "";
   };
 
-  const filteredJobs =
-    filterStatus === "Todos"
-      ? jobs
-      : jobs.filter((job) => job.status === filterStatus);
+  const filteredJobs = jobs.filter((job) => {
+    const matchesStatus =
+      filterStatus === "Todos" || job.status === filterStatus;
+    const matchesSearch = job.company
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Job Track
           </h1>
@@ -156,6 +162,8 @@ const JobsPage = () => {
           onStatusChange={setFilterStatus}
         />
 
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+
         <div className="mt-6 flex flex-col gap-4">
           {filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
@@ -172,7 +180,7 @@ const JobsPage = () => {
               <p className="text-gray-500 dark:text-gray-400">
                 {jobs.length === 0
                   ? "Nenhuma vaga adicionada ainda."
-                  : "Nenhuma vaga encontrada com este status."}
+                  : "Nenhuma vaga encontrada com estes filtros."}
               </p>
             </div>
           )}
