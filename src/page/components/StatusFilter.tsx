@@ -20,7 +20,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   ];
 
   return (
-    <div className="mb-6 flex flex-wrap gap-2">
+    <div className="mb-6 flex justify-center sm:justify-start flex-wrap gap-2">
       {statuses.map((status) => (
         <button
           key={status}
