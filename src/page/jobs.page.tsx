@@ -1,7 +1,7 @@
 "use client";
 
 import JobItem from "./components/JobItem";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
 import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
@@ -11,6 +11,7 @@ import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
+import Image from "next/image";
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -130,12 +131,36 @@ const JobsPage = () => {
     return matchesStatus && matchesSearch;
   });
 
+  const statusCounts = useMemo(() => {
+    const counts = {
+      Todos: jobs.length,
+      Aplicado: 0,
+      Entrevista: 0,
+      Rejeitado: 0,
+      "Sem resposta": 0,
+    };
+
+    jobs.forEach((job) => {
+      if (counts[job.status] !== undefined) {
+        counts[job.status]++;
+      }
+    });
+
+    return counts;
+  }, [jobs]);
+
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Job Track
+          <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white">
+            <Image
+              src="/job-track.svg"
+              alt="Job Track"
+              width={32}
+              height={32}
+            />
+            <span>Job Track</span>
           </h1>
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
             <Button variant="secondary" as="label" className="w-full sm:w-auto">
@@ -169,6 +194,7 @@ const JobsPage = () => {
         <StatusFilter
           currentStatus={filterStatus}
           onStatusChange={setFilterStatus}
+          counts={statusCounts}
         />
 
         <SearchBar value={searchQuery} onChange={setSearchQuery} />

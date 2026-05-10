@@ -5,11 +5,13 @@ import { clsx } from "clsx";
 interface StatusFilterProps {
   currentStatus: JobStatus | "Todos";
   onStatusChange: (status: JobStatus | "Todos") => void;
+  counts: Record<string, number>;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
   currentStatus,
   onStatusChange,
+  counts,
 }) => {
   const statuses: (JobStatus | "Todos")[] = [
     "Todos",
@@ -20,13 +22,13 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   ];
 
   return (
-    <div className="mb-6 flex justify-center sm:justify-start flex-wrap gap-2">
+    <div className="mb-6 flex flex-wrap justify-center gap-2 sm:justify-start">
       {statuses.map((status) => (
         <button
           key={status}
           onClick={() => onStatusChange(status)}
           className={clsx(
-            "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+            "flex items-center cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
             currentStatus === status
               ? "bg-blue-600 text-white"
               : [
@@ -36,7 +38,19 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
                 ],
           )}
         >
-          {status}
+          <span>{status}</span>
+          {counts[status] > 0 && (
+            <span
+              className={clsx(
+                "ml-2 rounded-full px-2 py-0.5 text-xs font-bold",
+                currentStatus === status
+                  ? "bg-white/20 text-white"
+                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400",
+              )}
+            >
+              {counts[status]}
+            </span>
+          )}
         </button>
       ))}
     </div>
