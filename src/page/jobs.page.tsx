@@ -20,7 +20,13 @@ const JobsPage = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [viewingJob, setViewingJob] = useState<Job | null>(null);
-  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant?: "danger" | "warning" | "info";
+  } | null>(null);
+
   const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
     "Todos",
   );
@@ -61,15 +67,16 @@ const JobsPage = () => {
   };
 
   const handleDeleteClick = (id: string) => {
-    setJobToDelete(id);
+    setConfirmConfig({
+      title: "Excluir Vaga",
+      message:
+        "Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita.",
+      variant: "danger",
+      onConfirm: () => {
+        setJobs((prev) => prev.filter((j) => j.id !== id));
+      },
+    });
     setIsConfirmOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (jobToDelete) {
-      setJobs(jobs.filter((j) => j.id !== jobToDelete));
-      setJobToDelete(null);
-    }
   };
 
   const openAddModal = () => {
@@ -77,7 +84,7 @@ const JobsPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleExport = () => {
+  const triggerExport = () => {
     const dataStr = JSON.stringify(jobs, null, 2);
     const dataUri =
       "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
@@ -91,6 +98,17 @@ const JobsPage = () => {
     linkElement.click();
   };
 
+  const handleExportClick = () => {
+    setConfirmConfig({
+      title: "Exportar Dados",
+      message:
+        "Deseja baixar um arquivo de backup (.json) com todas as suas vagas atuais?",
+      variant: "info",
+      onConfirm: triggerExport,
+    });
+    setIsConfirmOpen(true);
+  };
+
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -101,13 +119,16 @@ const JobsPage = () => {
         const content = e.target?.result as string;
         const importedJobs = JSON.parse(content);
         if (Array.isArray(importedJobs)) {
-          if (
-            confirm(
-              "Deseja substituir as vagas atuais pelas do arquivo importado?",
-            )
-          ) {
-            setJobs(importedJobs);
-          }
+          setConfirmConfig({
+            title: "Importar Dados",
+            message:
+              "Deseja substituir todas as vagas atuais pelas do arquivo importado? Esta ação sobrescreverá seus dados locais.",
+            variant: "warning",
+            onConfirm: () => {
+              setJobs(importedJobs);
+            },
+          });
+          setIsConfirmOpen(true);
         } else {
           alert(
             "Arquivo JSON inválido. Certifique-se de que é uma lista de vagas.",
@@ -173,7 +194,7 @@ const JobsPage = () => {
               />
             </Button>
             <Button
-              onClick={handleExport}
+              onClick={handleExportClick}
               variant="secondary"
               className="w-full sm:w-auto"
             >
@@ -238,11 +259,10 @@ const JobsPage = () => {
       <ConfirmationModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmDelete}
-        title="Excluir Vaga"
-        message="Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita."
-        confirmText="Excluir"
-        variant="danger"
+        onConfirm={confirmConfig?.onConfirm || (() => {})}
+        title={confirmConfig?.title || ""}
+        message={confirmConfig?.message || ""}
+        variant={confirmConfig?.variant}
       />
     </main>
   );
