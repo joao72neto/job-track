@@ -7,9 +7,10 @@ interface JobItemProps {
   job: Job;
   onEdit: (job: Job) => void;
   onDelete: (id: string) => void;
+  onView: (job: Job) => void;
 }
 
-const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
+const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
   const statusColors = {
     Aplicado: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
     Entrevista:
@@ -20,63 +21,97 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete }) => {
   };
 
   return (
-    <tr
+    <div
+      onClick={() => onView(job)}
       className={clsx(
-        "border-b bg-white hover:bg-gray-50 cursor-default",
-        "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-white/10",
+        "group flex flex-col gap-3 rounded-lg border border-black/20 p-4 transition-all bg-white",
+        "dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-400 cursor-pointer",
+        "sm:flex-row sm:items-center sm:justify-between min-h-20 hover:border-blue-500",
       )}
     >
-      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-        {job.company}
-      </td>
-      <td className="px-6 py-4">{job.role}</td>
-      <td className="px-6 py-4">{job.platform}</td>
-      <td className="px-6 py-4">{job.date}</td>
-      <td className="px-6 py-4">
-        <span
+      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+        <div className="min-w-37.5 flex-1">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+            {job.company}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 md:hidden">
+            {job.role}
+          </p>
+        </div>
+
+        <div className="hidden flex-1 md:block">
+          <p className="font-medium text-gray-700 dark:text-gray-300">
+            {job.role}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {job.platform}
+          </p>
+        </div>
+
+        <div className="hidden lg:block lg:w-32">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{job.date}</p>
+        </div>
+
+        <div className="flex items-center">
+          <span
+            className={clsx(
+              "rounded-full px-2.5 py-0.5 text-xs font-medium",
+              statusColors[job.status],
+            )}
+          >
+            {job.status}
+          </span>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "flex items-center justify-end dark:border-gray-700 border-t pt-2 sm:border-t-0 sm:pt-0",
+        )}
+      >
+        {job.link && (
+          <a
+            href={job.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className={clsx(
+              "rounded-lg p-2 text-emerald-600 hover:bg-emerald-50",
+              "dark:text-emerald-400 dark:hover:bg-emerald-900/30",
+            )}
+            title="Ver vaga"
+          >
+            <HiExternalLink size={20} />
+          </a>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(job);
+          }}
           className={clsx(
-            "rounded-full px-2.5 py-0.5 text-xs font-medium",
-            statusColors[job.status],
+            "rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-500 ",
+            "dark:hover:bg-blue-900/30 cursor-pointer",
           )}
+          title="Editar"
         >
-          {job.status}
-        </span>
-      </td>
-      <td className="px-6 py-4">
-        <div className="max-w-50 truncate" title={job.notes}>
-          {job.notes}
-        </div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="flex justify-end space-x-3">
-          {job.link && (
-            <a
-              href={job.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
-              title="Ver vaga"
-            >
-              <HiExternalLink size={20} />
-            </a>
+          <HiPencil size={20} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(job.id);
+          }}
+          className={clsx(
+            "rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-500 ",
+            "dark:hover:bg-red-900/30 cursor-pointer",
           )}
-          <button
-            onClick={() => onEdit(job)}
-            className="cursor-pointer text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400"
-            title="Editar"
-          >
-            <HiPencil size={20} />
-          </button>
-          <button
-            onClick={() => onDelete(job.id)}
-            className="cursor-pointer text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400"
-            title="Excluir"
-          >
-            <HiTrash size={20} />
-          </button>
-        </div>
-      </td>
-    </tr>
+          title="Excluir"
+        >
+          <HiTrash size={20} />
+        </button>
+      </div>
+    </div>
   );
 };
 

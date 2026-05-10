@@ -13,8 +13,8 @@ const variants = {
   ),
   secondary: clsx(
     base,
-    "border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300",
-    "dark:hover:bg-gray-700",
+    "border bg-white text-blue-600! hover:bg-gray-100 border-gray-300",
+    "dark:hover:bg-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300!",
   ),
 };
 

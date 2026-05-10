@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
 import StatusFilter from "./components/StatusFilter";
 import JobModal from "./components/JobModal";
+import JobViewModal from "./components/JobViewModal";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
@@ -12,7 +13,9 @@ import Button from "@/src/components/Button";
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [viewingJob, setViewingJob] = useState<Job | null>(null);
   const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
     "Todos",
   );
@@ -44,6 +47,11 @@ const JobsPage = () => {
   const handleEditJob = (job: Job) => {
     setEditingJob(job);
     setIsModalOpen(true);
+  };
+
+  const handleViewJob = (job: Job) => {
+    setViewingJob(job);
+    setIsViewModalOpen(true);
   };
 
   const handleDeleteJob = (id: string) => {
@@ -108,7 +116,7 @@ const JobsPage = () => {
       : jobs.filter((job) => job.status === filterStatus);
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -141,57 +149,26 @@ const JobsPage = () => {
           onStatusChange={setFilterStatus}
         />
 
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-            <thead className="bg-gray-100 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Empresa
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Vaga
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Plataforma
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Data
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Observações
-                </th>
-                <th scope="col" className="px-6 py-3 text-right">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map((job) => (
-                  <JobItem
-                    key={job.id}
-                    job={job}
-                    onEdit={handleEditJob}
-                    onDelete={handleDeleteJob}
-                  />
-                ))
-              ) : (
-                <tr className="bg-white dark:bg-gray-800">
-                  <td
-                    colSpan={7}
-                    className="px-6 py-8 text-center text-gray-500"
-                  >
-                    {jobs.length === 0
-                      ? "Nenhuma vaga adicionada ainda."
-                      : "Nenhuma vaga encontrada com este status."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="mt-6 flex flex-col gap-4">
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => (
+              <JobItem
+                key={job.id}
+                job={job}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                onView={handleViewJob}
+              />
+            ))
+          ) : (
+            <div className="border border-black/20 dark:border-gray-700 rounded-lg bg-white p-12 text-center dark:bg-gray-800">
+              <p className="text-gray-500 dark:text-gray-400">
+                {jobs.length === 0
+                  ? "Nenhuma vaga adicionada ainda."
+                  : "Nenhuma vaga encontrada com este status."}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -200,6 +177,12 @@ const JobsPage = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleAddJob}
         editingJob={editingJob}
+      />
+
+      <JobViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        job={viewingJob}
       />
     </main>
   );

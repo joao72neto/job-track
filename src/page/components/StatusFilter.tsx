@@ -32,7 +32,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
               : [
                   "bg-white text-gray-700 hover:bg-gray-100",
                   "dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
-                  "border border-gray-300 dark:border-gray-600",
+                  "border border-black/20 dark:border-gray-600",
                 ],
           )}
         >
