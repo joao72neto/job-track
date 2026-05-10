@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,14 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Job Track",
   description: "Tracker for job applications",
+  manifest: "/manifest.json",
   icons: {
-    icon: [
-      {
-        url: "/job-track.svg",
-        type: "image/svg+xml",
-      },
-    ],
+    icon: "/job-track.svg",
+    apple: "/job-track-192.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#222222",
 };
 
 export default function RootLayout({
