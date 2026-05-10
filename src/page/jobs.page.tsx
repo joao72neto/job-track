@@ -122,8 +122,8 @@ const JobsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Job Track
           </h1>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" as="label">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <Button variant="secondary" as="label" className="w-full sm:w-auto">
               Importar JSON
               <input
                 type="file"
@@ -132,10 +132,17 @@ const JobsPage = () => {
                 className="hidden"
               />
             </Button>
-            <Button onClick={handleExport} variant="secondary">
+            <Button
+              onClick={handleExport}
+              variant="secondary"
+              className="w-full sm:w-auto"
+            >
               Exportar JSON
             </Button>
-            <Button onClick={openAddModal}>
+            <Button
+              onClick={openAddModal}
+              className="col-span-2 w-full sm:w-auto"
+            >
               <div className="flex items-center gap-2">
                 <HiPlus size={20} />
                 <span>Adicionar nova vaga</span>
