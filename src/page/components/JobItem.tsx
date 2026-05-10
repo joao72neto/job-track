@@ -76,7 +76,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
 
       <div
         className={clsx(
-          "flex items-center justify-end gap-1 border-t pt-3 sm:border-t-0 sm:pt-0",
+          "flex items-center justify-end gap-1 border-t pt-3 space-x-3 sm:space-x-0 sm:border-t-0 sm:pt-0",
           "dark:border-gray-700 sm:w-25",
         )}
       >
@@ -97,7 +97,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
             e.stopPropagation();
             onEdit(job);
           }}
-          className="rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-blue-900/30"
+          className="cursor-pointer rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-blue-900/30"
           title="Editar"
         >
           <HiPencil size={20} />
@@ -107,7 +107,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
             e.stopPropagation();
             onDelete(job.id);
           }}
-          className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900/30"
+          className="cursor-pointer rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900/30"
           title="Excluir"
         >
           <HiTrash size={20} />

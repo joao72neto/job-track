@@ -84,6 +84,7 @@ const JobModal: React.FC<JobModalProps> = ({
           name="company"
           value={formData.company}
           onChange={handleChange}
+          placeholder="Ex: Google, Nubank..."
         />
         <Input
           required
@@ -139,6 +140,7 @@ const JobModal: React.FC<JobModalProps> = ({
           name="notes"
           value={formData.notes}
           onChange={handleChange}
+          placeholder="..."
         />
         <div className="mt-6 flex justify-end space-x-3">
           <Button type="button" variant="secondary" onClick={onClose}>

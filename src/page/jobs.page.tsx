@@ -7,6 +7,7 @@ import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
 import JobModal from "./components/JobModal";
 import JobViewModal from "./components/JobViewModal";
+import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
@@ -15,8 +16,10 @@ const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [viewingJob, setViewingJob] = useState<Job | null>(null);
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
     "Todos",
   );
@@ -56,9 +59,15 @@ const JobsPage = () => {
     setIsViewModalOpen(true);
   };
 
-  const handleDeleteJob = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta vaga?")) {
-      setJobs(jobs.filter((j) => j.id !== id));
+  const handleDeleteClick = (id: string) => {
+    setJobToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (jobToDelete) {
+      setJobs(jobs.filter((j) => j.id !== jobToDelete));
+      setJobToDelete(null);
     }
   };
 
@@ -171,7 +180,7 @@ const JobsPage = () => {
                 key={job.id}
                 job={job}
                 onEdit={handleEditJob}
-                onDelete={handleDeleteJob}
+                onDelete={handleDeleteClick}
                 onView={handleViewJob}
               />
             ))
@@ -198,6 +207,16 @@ const JobsPage = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         job={viewingJob}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Vaga"
+        message="Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita."
+        confirmText="Excluir"
+        variant="danger"
       />
     </main>
   );
