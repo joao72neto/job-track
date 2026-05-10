@@ -52,7 +52,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         <p className="mb-6 text-gray-500 dark:text-gray-400">{message}</p>
 
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+        <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-center">
           <Button
             variant="secondary"
             onClick={onClose}
