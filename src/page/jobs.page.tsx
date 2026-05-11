@@ -3,15 +3,19 @@
 import JobItem from "./components/JobItem";
 import { useEffect, useMemo, useState } from "react";
 import { Job, JobStatus } from "./jobs.types";
+import { autoUpdateJobs, autoUpdateJobStatus } from "./jobs.utils";
 import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
 import JobModal from "./components/JobModal";
 import JobViewModal from "./components/JobViewModal";
 import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
+import Pagination from "@/src/components/Pagination";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 import Image from "next/image";
+
+const ITEMS_PER_PAGE = 10;
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -31,12 +35,18 @@ const JobsPage = () => {
     "Todos",
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, searchQuery]);
 
   useEffect(() => {
     const savedJobs = localStorage.getItem("jobs");
     if (savedJobs) {
       try {
-        setJobs(JSON.parse(savedJobs));
+        const parsedJobs = JSON.parse(savedJobs);
+        setJobs(autoUpdateJobs(parsedJobs));
       } catch (e) {
         console.error("Error loading jobs:", e);
       }
@@ -48,10 +58,11 @@ const JobsPage = () => {
   }, [jobs]);
 
   const handleAddJob = (job: Job) => {
+    const processedJob = autoUpdateJobStatus(job);
     if (editingJob) {
-      setJobs(jobs.map((j) => (j.id === job.id ? job : j)));
+      setJobs(jobs.map((j) => (j.id === processedJob.id ? processedJob : j)));
     } else {
-      setJobs([job, ...jobs]);
+      setJobs([processedJob, ...jobs]);
     }
     setEditingJob(null);
   };
@@ -125,7 +136,7 @@ const JobsPage = () => {
               "Deseja substituir todas as vagas atuais pelas do arquivo importado? Esta ação sobrescreverá seus dados locais.",
             variant: "warning",
             onConfirm: () => {
-              setJobs(importedJobs);
+              setJobs(autoUpdateJobs(importedJobs));
             },
           });
           setIsConfirmOpen(true);
@@ -151,6 +162,12 @@ const JobsPage = () => {
       .includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
+
+  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   const statusCounts = useMemo(() => {
     const counts = {
@@ -221,16 +238,24 @@ const JobsPage = () => {
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
         <div className="mt-6 flex flex-col gap-4">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => (
-              <JobItem
-                key={job.id}
-                job={job}
-                onEdit={handleEditJob}
-                onDelete={handleDeleteClick}
-                onView={handleViewJob}
+          {paginatedJobs.length > 0 ? (
+            <>
+              {paginatedJobs.map((job) => (
+                <JobItem
+                  key={job.id}
+                  job={job}
+                  onEdit={handleEditJob}
+                  onDelete={handleDeleteClick}
+                  onView={handleViewJob}
+                />
+              ))}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                className="mt-4"
               />
-            ))
+            </>
           ) : (
             <div className="border border-black/20 dark:border-gray-700 rounded-lg bg-white p-12 text-center dark:bg-gray-800">
               <p className="text-gray-500 dark:text-gray-400">

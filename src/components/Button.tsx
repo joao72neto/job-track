@@ -3,6 +3,7 @@ import clsx from "clsx";
 
 const baseStyles = clsx(
   "inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium cursor-pointer transition-colors",
+  "disabled:opacity-50 disabled:cursor-not-allowed",
 );
 
 const variants = {
@@ -18,14 +19,22 @@ const variants = {
   ),
 };
 
+const sizes = {
+  sm: "h-8",
+  md: "h-10",
+  lg: "h-12",
+};
+
 interface ButtonProps extends ComponentPropsWithRef<"button"> {
   variant?: keyof typeof variants;
   as?: "button" | "label";
   className?: string;
+  size?: keyof typeof sizes;
 }
 
 const Button = ({
   variant = "primary",
+  size = "md",
   children,
   as = "button",
   className,
@@ -34,7 +43,10 @@ const Button = ({
   const Component = as as ElementType;
 
   return (
-    <Component className={clsx(variants[variant], className)} {...rest}>
+    <Component
+      className={clsx(variants[variant], sizes[size], className)}
+      {...rest}
+    >
       {children}
     </Component>
   );
