@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { googleDriveService } from "@/src/services/googleDrive.service";
+import { googleDriveService } from "@/src/googleDrive.service";
 import { useAuth } from "@/src/contexts/auth.context";
 
 export const useGoogleDrive = () => {

@@ -8,15 +8,15 @@ import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
 import JobModal from "./components/JobModal";
 import JobViewModal from "./components/JobViewModal";
-import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
 import Pagination from "@/src/components/Pagination";
 import GoogleDriveSync from "./components/GoogleDriveSync";
+import { useAuth } from "@/src/contexts/auth.context";
 import { useGoogleDrive } from "./hooks/useGoogleDrive";
+import { useModal } from "@/src/contexts/modal.context";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 import Image from "next/image";
-import { useAuth } from "../contexts/auth.context";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,17 +24,12 @@ const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const { isAuthenticated, login, logout } = useAuth();
   const { pushToDrive, pullFromDrive, isSyncing } = useGoogleDrive();
+  const { showDanger, showWarning, showSuccess, showInfo } = useModal();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [viewingJob, setViewingJob] = useState<Job | null>(null);
-  const [confirmConfig, setConfirmConfig] = useState<{
-    title: string;
-    message: string;
-    onConfirm: () => void;
-    variant?: "danger" | "warning" | "info";
-  } | null>(null);
 
   const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
     "Todos",
@@ -83,16 +78,14 @@ const JobsPage = () => {
   };
 
   const handleDeleteClick = (id: string) => {
-    setConfirmConfig({
+    showDanger({
       title: "Excluir Vaga",
       message:
         "Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita.",
-      variant: "danger",
       onConfirm: () => {
         setJobs((prev) => prev.filter((j) => j.id !== id));
       },
     });
-    setIsConfirmOpen(true);
   };
 
   const openAddModal = () => {
@@ -115,14 +108,13 @@ const JobsPage = () => {
   };
 
   const handleExportClick = () => {
-    setConfirmConfig({
+    showWarning({
       title: "Exportar Dados",
       message:
         "Deseja baixar um arquivo de backup (.json) com todas as suas vagas atuais?",
-      variant: "info",
       onConfirm: triggerExport,
+      confirmText: "Exportar",
     });
-    setIsConfirmOpen(true);
   };
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,20 +127,21 @@ const JobsPage = () => {
         const content = e.target?.result as string;
         const importedJobs = JSON.parse(content);
         if (Array.isArray(importedJobs)) {
-          setConfirmConfig({
+          showWarning({
             title: "Importar Dados",
             message:
               "Deseja substituir todas as vagas atuais pelas do arquivo importado? Esta ação sobrescreverá seus dados locais.",
-            variant: "warning",
             onConfirm: () => {
               setJobs(autoUpdateJobs(importedJobs));
             },
+            confirmText: "Importar",
           });
-          setIsConfirmOpen(true);
         } else {
-          alert(
-            "Arquivo JSON inválido. Certifique-se de que é uma lista de vagas.",
-          );
+          showWarning({
+            title: "Erro na Importação",
+            message:
+              "Arquivo JSON inválido. Certifique-se de que é uma lista de vagas.",
+          });
         }
       } catch (err) {
         console.error("Erro ao importar JSON:", err);
@@ -162,29 +155,41 @@ const JobsPage = () => {
   const handlePush = async () => {
     try {
       await pushToDrive(jobs);
-      alert("Backup enviado com sucesso para o Google Drive!");
+      showSuccess({
+        title: "Backup Concluído",
+        message: "Seus dados foram salvos com sucesso no Google Drive!",
+      });
     } catch (err: any) {
-      alert("Erro ao fazer backup: " + err.message);
+      showDanger({
+        title: "Erro no Backup",
+        message: err.message,
+      });
     }
   };
 
   const handlePull = async () => {
-    if (
-      !confirm(
+    showWarning({
+      title: "Restaurar Dados",
+      message:
         "Isso substituirá todas as suas vagas locais pelos dados do Google Drive. Deseja continuar?",
-      )
-    )
-      return;
-
-    try {
-      const data = await pullFromDrive();
-      if (data && Array.isArray(data)) {
-        setJobs(autoUpdateJobs(data));
-        alert("Dados restaurados com sucesso!");
-      }
-    } catch (err: any) {
-      alert("Erro ao restaurar dados: " + err.message);
-    }
+      onConfirm: async () => {
+        try {
+          const data = await pullFromDrive();
+          if (data && Array.isArray(data)) {
+            setJobs(autoUpdateJobs(data));
+            showSuccess({
+              title: "Restauração Concluída",
+              message: "Seus dados foram restaurados com sucesso!",
+            });
+          }
+        } catch (err: any) {
+          showDanger({
+            title: "Erro na Restauração",
+            message: err.message,
+          });
+        }
+      },
+    });
   };
 
   const filteredJobs = jobs.filter((job) => {
@@ -320,15 +325,6 @@ const JobsPage = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         job={viewingJob}
-      />
-
-      <ConfirmationModal
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={confirmConfig?.onConfirm || (() => {})}
-        title={confirmConfig?.title || ""}
-        message={confirmConfig?.message || ""}
-        variant={confirmConfig?.variant}
       />
     </main>
   );

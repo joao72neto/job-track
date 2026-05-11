@@ -43,7 +43,6 @@ export const googleDriveService = {
    */
   async uploadFile(token: string, data: any, fileId?: string): Promise<void> {
     if (fileId) {
-      // Update existing file
       const response = await fetch(
         `${UPLOAD_API_URL}/${fileId}?uploadType=media`,
         {
@@ -58,7 +57,6 @@ export const googleDriveService = {
 
       if (!response.ok) throw new Error("Erro ao atualizar arquivo no Drive");
     } else {
-      // Create new file
       const metadata = {
         name: FILE_NAME,
         mimeType: "application/json",
