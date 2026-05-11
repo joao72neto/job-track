@@ -42,7 +42,7 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
 
   return (
     <>
-      {isSynced ? (
+      {isSynced && !isSyncing ? (
         <div
           className={clsx(
             "flex w-full items-center justify-center gap-2",
