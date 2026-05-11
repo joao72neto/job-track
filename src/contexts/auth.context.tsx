@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import LoadingScreen from "../components/LoadingScreen";
 
 interface AuthContextType {
   googleToken: string | null;
@@ -27,7 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const savedToken = localStorage.getItem("google_token");
     if (savedToken) setGoogleToken(savedToken);
-    setLoading(false);
+
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
   }, []);
 
   const login = useGoogleLogin({
@@ -43,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("google_token");
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   return (
     <AuthContext.Provider
