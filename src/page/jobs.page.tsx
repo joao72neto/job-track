@@ -229,7 +229,7 @@ const JobsPage = () => {
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white min-w-60">
             <Image
               src="/job-track.svg"
               alt="Job Track"
@@ -247,22 +247,28 @@ const JobsPage = () => {
               onPush={handlePush}
               onPull={handlePull}
             />
-            <Button variant="secondary" as="label" className="w-full lg:w-auto">
-              Importar JSON
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImport}
-                className="hidden"
-              />
-            </Button>
-            <Button
-              onClick={handleExportClick}
-              variant="secondary"
-              className="w-full lg:w-auto"
-            >
-              Exportar JSON
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                as="label"
+                className="w-full lg:w-auto"
+              >
+                Importar JSON
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="hidden"
+                />
+              </Button>
+              <Button
+                onClick={handleExportClick}
+                variant="secondary"
+                className="w-full lg:w-auto"
+              >
+                Exportar JSON
+              </Button>
+            </div>
             <Button
               onClick={openAddModal}
               className="w-full sm:col-span-2 lg:w-auto"
