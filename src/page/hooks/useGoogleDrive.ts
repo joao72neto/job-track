@@ -5,7 +5,31 @@ import { useAuth } from "@/src/contexts/auth.context";
 export const useGoogleDrive = () => {
   const { googleToken } = useAuth();
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isSynced, setIsSynced] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const checkSyncStatus = useCallback(
+    async (localData: any) => {
+      if (!googleToken) return;
+      try {
+        const fileId = await googleDriveService.findBackupFile(googleToken);
+        if (!fileId) {
+          setIsSynced(false);
+          return;
+        }
+        const remoteData = await googleDriveService.downloadFile(
+          googleToken,
+          fileId,
+        );
+        const isSame = JSON.stringify(localData) === JSON.stringify(remoteData);
+        setIsSynced(isSame);
+      } catch (err) {
+        console.error("Erro ao verificar sincronização:", err);
+        setIsSynced(false);
+      }
+    },
+    [googleToken],
+  );
 
   const pushToDrive = useCallback(
     async (data: any) => {
@@ -19,6 +43,7 @@ export const useGoogleDrive = () => {
           data,
           fileId || undefined,
         );
+        setIsSynced(true);
       } catch (err: any) {
         setError(err.message || "Erro ao enviar dados para o Drive");
         throw err;
@@ -38,7 +63,9 @@ export const useGoogleDrive = () => {
       if (!fileId) {
         throw new Error("Nenhum backup encontrado no Google Drive.");
       }
-      return await googleDriveService.downloadFile(googleToken, fileId);
+      const data = await googleDriveService.downloadFile(googleToken, fileId);
+      setIsSynced(true);
+      return data;
     } catch (err: any) {
       setError(err.message || "Erro ao baixar dados do Drive");
       throw err;
@@ -50,7 +77,10 @@ export const useGoogleDrive = () => {
   return {
     pushToDrive,
     pullFromDrive,
+    checkSyncStatus,
+    setIsSynced,
     isSyncing,
+    isSynced,
     error,
   };
 };

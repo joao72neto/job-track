@@ -22,10 +22,12 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [googleToken, setGoogleToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("google_token");
     if (savedToken) setGoogleToken(savedToken);
+    setLoading(false);
   }, []);
 
   const login = useGoogleLogin({
@@ -40,6 +42,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setGoogleToken(null);
     localStorage.removeItem("google_token");
   };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <AuthContext.Provider

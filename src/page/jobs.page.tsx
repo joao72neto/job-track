@@ -22,9 +22,17 @@ const ITEMS_PER_PAGE = 10;
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
-  const { isAuthenticated, login, logout } = useAuth();
-  const { pushToDrive, pullFromDrive, isSyncing } = useGoogleDrive();
-  const { showDanger, showWarning, showSuccess, showInfo } = useModal();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { isAuthenticated, login, logout, googleToken } = useAuth();
+  const {
+    pushToDrive,
+    pullFromDrive,
+    checkSyncStatus,
+    setIsSynced,
+    isSyncing,
+    isSynced,
+  } = useGoogleDrive();
+  const { showDanger, showWarning, showSuccess } = useModal();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -46,19 +54,30 @@ const JobsPage = () => {
     if (savedJobs) {
       try {
         const parsedJobs = JSON.parse(savedJobs);
-        setJobs(autoUpdateJobs(parsedJobs));
+        const updatedJobs = autoUpdateJobs(parsedJobs);
+        setJobs(updatedJobs);
       } catch (e) {
         console.error("Error loading jobs:", e);
       }
     }
+    setIsInitialized(true);
   }, []);
 
   useEffect(() => {
+    if (!isInitialized) return;
     localStorage.setItem("jobs", JSON.stringify(jobs));
-  }, [jobs]);
+  }, [jobs, isInitialized]);
+
+  useEffect(() => {
+    if (googleToken && isInitialized && jobs.length > 0) {
+      checkSyncStatus(jobs);
+    }
+  }, [googleToken, isInitialized, checkSyncStatus]);
 
   const handleAddJob = (job: Job) => {
     const processedJob = autoUpdateJobStatus(job);
+    if (isSynced) setIsSynced(false);
+
     if (editingJob) {
       setJobs(jobs.map((j) => (j.id === processedJob.id ? processedJob : j)));
     } else {
@@ -83,6 +102,7 @@ const JobsPage = () => {
       message:
         "Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita.",
       onConfirm: () => {
+        if (isSynced) setIsSynced(false);
         setJobs((prev) => prev.filter((j) => j.id !== id));
       },
     });
@@ -132,12 +152,13 @@ const JobsPage = () => {
             message:
               "Deseja substituir todas as vagas atuais pelas do arquivo importado? Esta ação sobrescreverá seus dados locais.",
             onConfirm: () => {
+              if (isSynced) setIsSynced(false);
               setJobs(autoUpdateJobs(importedJobs));
             },
             confirmText: "Importar",
           });
         } else {
-          showWarning({
+          showDanger({
             title: "Erro na Importação",
             message:
               "Arquivo JSON inválido. Certifique-se de que é uma lista de vagas.",
@@ -229,7 +250,7 @@ const JobsPage = () => {
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white min-w-60">
+          <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white min-w-50">
             <Image
               src="/job-track.svg"
               alt="Job Track"
@@ -242,33 +263,28 @@ const JobsPage = () => {
             <GoogleDriveSync
               isAuthenticated={isAuthenticated}
               isSyncing={isSyncing}
+              isSynced={isSynced}
               login={login}
               logout={logout}
               onPush={handlePush}
               onPull={handlePull}
             />
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                as="label"
-                className="w-full lg:w-auto"
-              >
-                Importar JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="hidden"
-                />
-              </Button>
-              <Button
-                onClick={handleExportClick}
-                variant="secondary"
-                className="w-full lg:w-auto"
-              >
-                Exportar JSON
-              </Button>
-            </div>
+            <Button variant="secondary" as="label" className="w-full lg:w-auto">
+              Importar JSON
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </Button>
+            <Button
+              onClick={handleExportClick}
+              variant="secondary"
+              className="w-full lg:w-auto"
+            >
+              Exportar JSON
+            </Button>
             <Button
               onClick={openAddModal}
               className="w-full sm:col-span-2 lg:w-auto"
