@@ -16,7 +16,7 @@ import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 import Image from "next/image";
-import { useAuth } from "../auth.context";
+import { useAuth } from "../contexts/auth.context";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -223,7 +223,7 @@ const JobsPage = () => {
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white">
             <Image
               src="/job-track.svg"
@@ -233,7 +233,7 @@ const JobsPage = () => {
             />
             <span>Job Track</span>
           </h1>
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+          <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-end">
             <GoogleDriveSync
               isAuthenticated={isAuthenticated}
               isSyncing={isSyncing}
@@ -242,7 +242,7 @@ const JobsPage = () => {
               onPush={handlePush}
               onPull={handlePull}
             />
-            <Button variant="secondary" as="label" className="w-full sm:w-auto">
+            <Button variant="secondary" as="label" className="w-full lg:w-auto">
               Importar JSON
               <input
                 type="file"
@@ -254,15 +254,15 @@ const JobsPage = () => {
             <Button
               onClick={handleExportClick}
               variant="secondary"
-              className="w-full sm:w-auto"
+              className="w-full lg:w-auto"
             >
               Exportar JSON
             </Button>
             <Button
               onClick={openAddModal}
-              className="col-span-2 w-full sm:w-auto"
+              className="w-full sm:col-span-2 lg:w-auto"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <HiPlus size={20} />
                 <span>Adicionar nova vaga</span>
               </div>

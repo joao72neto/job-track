@@ -27,8 +27,8 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
 }) => {
   if (!isAuthenticated) {
     return (
-      <Button variant="secondary" onClick={login} className="w-full sm:w-auto">
-        <div className="flex items-center gap-2">
+      <Button variant="secondary" onClick={login}>
+        <div className="flex items-center justify-center gap-2">
           <FcGoogle size={20} />
           <span>Conectar Google Drive</span>
         </div>
@@ -37,7 +37,7 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <>
       <Button
         variant="secondary"
         onClick={onPush}
@@ -45,7 +45,7 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
         title="Enviar backup para o Drive"
         className="w-full sm:w-auto"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           {isSyncing ? (
             <HiRefresh size={20} className="animate-spin" />
           ) : (
@@ -61,7 +61,7 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
         title="Restaurar backup do Drive"
         className="w-full sm:w-auto"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           {isSyncing ? (
             <HiRefresh size={20} className="animate-spin" />
           ) : (
@@ -77,12 +77,12 @@ const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({
         title="Desconectar"
         className="w-full sm:w-auto"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <HiLogout size={20} className="text-red-500" />
-          <span>Sair</span>
+          <span className="sm:hidden lg:inline">Sair</span>
         </div>
       </Button>
-    </div>
+    </>
   );
 };
 
