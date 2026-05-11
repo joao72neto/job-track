@@ -1,0 +1,64 @@
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useGoogleLogin } from "@react-oauth/google";
+
+interface AuthContextType {
+  googleToken: string | null;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [googleToken, setGoogleToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("google_token");
+    if (savedToken) setGoogleToken(savedToken);
+  }, []);
+
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      setGoogleToken(tokenResponse.access_token);
+      localStorage.setItem("google_token", tokenResponse.access_token);
+    },
+    scope: "https://www.googleapis.com/auth/drive.file",
+  });
+
+  const logout = () => {
+    setGoogleToken(null);
+    localStorage.removeItem("google_token");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        googleToken,
+        isAuthenticated: !!googleToken,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

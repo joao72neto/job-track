@@ -10,6 +10,8 @@ import JobModal from "./components/JobModal";
 import JobViewModal from "./components/JobViewModal";
 import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
 import Pagination from "@/src/components/Pagination";
+import GoogleDriveSync from "./components/GoogleDriveSync";
+import { useAuth } from "@/src/auth.context";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
@@ -19,6 +21,7 @@ const ITEMS_PER_PAGE = 10;
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const { isAuthenticated, login, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -201,6 +204,11 @@ const JobsPage = () => {
             <span>Job Track</span>
           </h1>
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <GoogleDriveSync
+              isAuthenticated={isAuthenticated}
+              login={login}
+              logout={logout}
+            />
             <Button variant="secondary" as="label" className="w-full sm:w-auto">
               Importar JSON
               <input
