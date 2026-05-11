@@ -4,13 +4,14 @@ import { useAuth } from "@/src/contexts/auth.context";
 
 export const useGoogleDrive = () => {
   const { googleToken } = useAuth();
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(!!googleToken);
   const [isSynced, setIsSynced] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const checkSyncStatus = useCallback(
     async (localData: any) => {
       if (!googleToken) return;
+      setIsSyncing(true);
       try {
         const fileId = await googleDriveService.findBackupFile(googleToken);
         if (!fileId) {
@@ -26,6 +27,8 @@ export const useGoogleDrive = () => {
       } catch (err) {
         console.error("Erro ao verificar sincronização:", err);
         setIsSynced(false);
+      } finally {
+        setIsSyncing(false);
       }
     },
     [googleToken],
