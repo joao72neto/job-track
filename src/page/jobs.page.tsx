@@ -269,22 +269,28 @@ const JobsPage = () => {
               onPush={handlePush}
               onPull={handlePull}
             />
-            <Button variant="secondary" as="label" className="w-full lg:w-auto">
-              Importar JSON
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImport}
-                className="hidden"
-              />
-            </Button>
-            <Button
-              onClick={handleExportClick}
-              variant="secondary"
-              className="w-full lg:w-auto"
-            >
-              Exportar JSON
-            </Button>
+            <div className="flex gap-2 sm:col-span-2">
+              <Button
+                variant="secondary"
+                as="label"
+                className="w-full lg:w-auto"
+              >
+                Importar JSON
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="hidden"
+                />
+              </Button>
+              <Button
+                onClick={handleExportClick}
+                variant="secondary"
+                className="w-full lg:w-auto"
+              >
+                Exportar JSON
+              </Button>
+            </div>
             <Button
               onClick={openAddModal}
               className="w-full sm:col-span-2 lg:w-auto"
