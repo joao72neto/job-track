@@ -11,17 +11,19 @@ import JobViewModal from "./components/JobViewModal";
 import ConfirmationModal from "@/src/components/modals/ConfirmationModal";
 import Pagination from "@/src/components/Pagination";
 import GoogleDriveSync from "./components/GoogleDriveSync";
-import { useAuth } from "@/src/auth.context";
+import { useGoogleDrive } from "./hooks/useGoogleDrive";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 import Image from "next/image";
+import { useAuth } from "../auth.context";
 
 const ITEMS_PER_PAGE = 10;
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const { isAuthenticated, login, logout } = useAuth();
+  const { pushToDrive, pullFromDrive, isSyncing } = useGoogleDrive();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -157,6 +159,34 @@ const JobsPage = () => {
     event.target.value = "";
   };
 
+  const handlePush = async () => {
+    try {
+      await pushToDrive(jobs);
+      alert("Backup enviado com sucesso para o Google Drive!");
+    } catch (err: any) {
+      alert("Erro ao fazer backup: " + err.message);
+    }
+  };
+
+  const handlePull = async () => {
+    if (
+      !confirm(
+        "Isso substituirá todas as suas vagas locais pelos dados do Google Drive. Deseja continuar?",
+      )
+    )
+      return;
+
+    try {
+      const data = await pullFromDrive();
+      if (data && Array.isArray(data)) {
+        setJobs(autoUpdateJobs(data));
+        alert("Dados restaurados com sucesso!");
+      }
+    } catch (err: any) {
+      alert("Erro ao restaurar dados: " + err.message);
+    }
+  };
+
   const filteredJobs = jobs.filter((job) => {
     const matchesStatus =
       filterStatus === "Todos" || job.status === filterStatus;
@@ -206,8 +236,11 @@ const JobsPage = () => {
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
             <GoogleDriveSync
               isAuthenticated={isAuthenticated}
+              isSyncing={isSyncing}
               login={login}
               logout={logout}
+              onPush={handlePush}
+              onPull={handlePull}
             />
             <Button variant="secondary" as="label" className="w-full sm:w-auto">
               Importar JSON
