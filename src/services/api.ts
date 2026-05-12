@@ -1,11 +1,25 @@
-import axios from "axios";
+import axios, { InternalAxiosRequestConfig } from "axios";
+import { localStorageKeys } from "../localStorage.utils";
 
-export const googleDriveApi = axios.create({
-  baseURL: "https://www.googleapis.com/drive/v3/files",
-  timeout: 10000,
-});
+const injectAuthToken = (config: InternalAxiosRequestConfig) => {
+  const token = localStorage.getItem(localStorageKeys.googleToken);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+};
 
-export const googleUploadApi = axios.create({
-  baseURL: "https://www.googleapis.com/upload/drive/v3/files",
-  timeout: 20000,
-});
+const createAuthenticatedGoogleApi = (baseURL: string, timeout: number) => {
+  const api = axios.create({ baseURL, timeout });
+  api.interceptors.request.use(injectAuthToken);
+  return api;
+};
+
+export const googleDriveApi = createAuthenticatedGoogleApi(
+  "https://www.googleapis.com/drive/v3/files",
+  10000,
+);
+export const googleUploadApi = createAuthenticatedGoogleApi(
+  "https://www.googleapis.com/upload/drive/v3/files",
+  20000,
+);

@@ -6,13 +6,10 @@ export const googleDriveService = {
   /**
    * Finds the backup file in Google Drive.
    */
-  async findBackupFile(token: string): Promise<string | null> {
+  async findBackupFile(): Promise<string | null> {
     const response = await googleDriveApi.get("", {
       params: {
         q: `name='${FILE_NAME}' and trashed=false`,
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -26,13 +23,10 @@ export const googleDriveService = {
   /**
    * Downloads the content of a file from Google Drive.
    */
-  async downloadFile(token: string, fileId: string): Promise<any> {
+  async downloadFile(fileId: string): Promise<any> {
     const response = await googleDriveApi.get(`/${fileId}`, {
       params: {
         alt: "media",
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -42,15 +36,11 @@ export const googleDriveService = {
   /**
    * Creates a new backup file or updates an existing one.
    */
-  async uploadFile(token: string, data: any, fileId?: string): Promise<void> {
+  async uploadFile(data: any, fileId?: string): Promise<void> {
     if (fileId) {
       await googleUploadApi.patch(`/${fileId}`, data, {
         params: {
           uploadType: "media",
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
       });
     } else {
@@ -72,9 +62,6 @@ export const googleDriveService = {
       await googleUploadApi.post("", formData, {
         params: {
           uploadType: "multipart",
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
         },
       });
     }
