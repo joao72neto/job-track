@@ -9,7 +9,6 @@ export const isOlderThanAMonth = (dateStr: string): boolean => {
   const date = new Date(dateStr);
   const now = new Date();
 
-  // Normalize dates to midnight to avoid time-of-day issues
   const checkDate = new Date(
     date.getFullYear(),
     date.getMonth(),

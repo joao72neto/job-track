@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Job } from "../jobs.types";
+import { jobSchema, JobForm } from "../jobs.schema";
 import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import ModalContainer from "@/src/components/modals/ModalContainer";
@@ -17,58 +20,57 @@ const JobModal: React.FC<JobModalProps> = ({
   onSave,
   editingJob,
 }) => {
-  const [formData, setFormData] = useState<Omit<Job, "id">>({
-    company: "",
-    role: "",
-    platform: "",
-    date: new Date().toISOString().split("T")[0],
-    status: "Aplicado",
-    notes: "",
-    link: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<JobForm>({
+    resolver: yupResolver(jobSchema),
+    mode: "onChange",
+    defaultValues: {
+      company: "",
+      role: "",
+      platform: "",
+      date: new Date(),
+      status: "Aplicado",
+      notes: "",
+      link: "",
+    },
   });
 
   useEffect(() => {
     if (editingJob) {
-      setFormData({
-        company: editingJob.company,
-        role: editingJob.role,
-        platform: editingJob.platform,
-        date: editingJob.date,
-        status: editingJob.status,
-        notes: editingJob.notes,
+      reset({
+        ...editingJob,
+        date: new Date(editingJob.date),
         link: editingJob.link || "",
+        notes: editingJob.notes || "",
       });
     } else {
-      setFormData({
+      reset({
         company: "",
         role: "",
         platform: "",
-        date: new Date().toISOString().split("T")[0],
+        date: new Date(),
         status: "Aplicado",
         notes: "",
         link: "",
       });
     }
-  }, [editingJob, isOpen]);
+  }, [editingJob, isOpen, reset]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (data: JobForm) => {
     onSave({
-      ...formData,
+      ...data,
       id: editingJob?.id || crypto.randomUUID(),
-    });
+      date: data.date.toISOString().split("T")[0],
+      link: data.link || undefined,
+      notes: data.notes || "",
+    } as Job);
     onClose();
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -76,58 +78,45 @@ const JobModal: React.FC<JobModalProps> = ({
       <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
         {editingJob ? "Editar Vaga" : "Adicionar Nova Vaga"}
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
-          required
           label="Empresa"
-          type="text"
-          name="company"
-          value={formData.company}
-          onChange={handleChange}
           placeholder="Ex: Google, Nubank..."
+          error={errors.company?.message}
+          {...register("company")}
         />
         <Input
-          required
           label="Vaga"
-          type="text"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
           placeholder="Ex: Front Junior, Fullstack..."
+          error={errors.role?.message}
+          {...register("role")}
         />
         <div className="grid grid-cols-2 gap-4">
           <Input
-            required
             label="Plataforma"
-            type="text"
-            name="platform"
-            value={formData.platform}
-            onChange={handleChange}
             placeholder="Ex: LinkedIn, Nerdin..."
+            error={errors.platform?.message}
+            {...register("platform")}
           />
           <Input
-            required
             label="Data"
             type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
+            error={errors.date?.message}
+            {...register("date")}
           />
         </div>
         <Input
           label="Link da vaga"
           type="url"
-          name="link"
-          value={formData.link}
-          onChange={handleChange}
           placeholder="https://..."
+          error={errors.link?.message}
+          {...register("link")}
         />
         <Input
           label="Status"
           as="select"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
+          error={errors.status?.message}
+          {...register("status")}
         >
           <option value="Aplicado">Aplicado</option>
           <option value="Entrevista">Entrevista</option>
@@ -138,10 +127,9 @@ const JobModal: React.FC<JobModalProps> = ({
         <Input
           label="Observações"
           as="textarea"
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
           placeholder="..."
+          error={errors.notes?.message}
+          {...register("notes")}
         />
         <div className="mt-6 flex justify-end space-x-3">
           <Button type="button" variant="secondary" onClick={onClose}>
