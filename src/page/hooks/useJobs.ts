@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { Job } from "../jobs.types";
 import { autoUpdateJobs, autoUpdateJobStatus } from "../jobs.utils";
+import { localStorageKeys } from "@/src/localStorage.utils";
 
 export const useJobs = (onSyncChange?: (isSynced: boolean) => void) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const savedJobs = localStorage.getItem("jobs");
+    const savedJobs = localStorage.getItem(localStorageKeys.jobs);
     if (savedJobs) {
       try {
         const parsedJobs = JSON.parse(savedJobs);
@@ -22,7 +23,7 @@ export const useJobs = (onSyncChange?: (isSynced: boolean) => void) => {
 
   useEffect(() => {
     if (!isInitialized) return;
-    localStorage.setItem("jobs", JSON.stringify(jobs));
+    localStorage.setItem(localStorageKeys.jobs, JSON.stringify(jobs));
   }, [jobs, isInitialized]);
 
   const addJob = useCallback(

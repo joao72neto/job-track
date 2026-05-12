@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import LoadingScreen from "../components/LoadingScreen";
+import { localStorageKeys } from "../localStorage.utils";
 
 interface AuthContextType {
   googleToken: string | null;
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("google_token");
+    const savedToken = localStorage.getItem(localStorageKeys.googleToken);
     if (savedToken) setGoogleToken(savedToken);
 
     const timer = setTimeout(() => setLoading(false), 800);
@@ -36,14 +37,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       setGoogleToken(tokenResponse.access_token);
-      localStorage.setItem("google_token", tokenResponse.access_token);
+      localStorage.setItem(
+        localStorageKeys.googleToken,
+        tokenResponse.access_token,
+      );
     },
     scope: "https://www.googleapis.com/auth/drive.file",
   });
 
   const logout = () => {
     setGoogleToken(null);
-    localStorage.removeItem("google_token");
+    localStorage.removeItem(localStorageKeys.googleToken);
   };
 
   if (loading) return <LoadingScreen />;
