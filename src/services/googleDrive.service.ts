@@ -1,5 +1,4 @@
-const DRIVE_API_URL = "https://www.googleapis.com/drive/v3/files";
-const UPLOAD_API_URL = "https://www.googleapis.com/upload/drive/v3/files";
+import { googleDriveApi, googleUploadApi } from "./api";
 
 const FILE_NAME = "job-track-data.json";
 
@@ -8,16 +7,16 @@ export const googleDriveService = {
    * Finds the backup file in Google Drive.
    */
   async findBackupFile(token: string): Promise<string | null> {
-    const response = await fetch(
-      `${DRIVE_API_URL}?q=name='${FILE_NAME}' and trashed=false`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await googleDriveApi.get("", {
+      params: {
+        q: `name='${FILE_NAME}' and trashed=false`,
       },
-    );
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    const data = await response.json();
+    const { data } = response;
     if (data.files && data.files.length > 0) {
       return data.files[0].id;
     }
@@ -28,14 +27,16 @@ export const googleDriveService = {
    * Downloads the content of a file from Google Drive.
    */
   async downloadFile(token: string, fileId: string): Promise<any> {
-    const response = await fetch(`${DRIVE_API_URL}/${fileId}?alt=media`, {
+    const response = await googleDriveApi.get(`/${fileId}`, {
+      params: {
+        alt: "media",
+      },
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (!response.ok) throw new Error("Erro ao baixar arquivo do Drive");
-    return await response.json();
+    return response.data;
   },
 
   /**
@@ -43,19 +44,15 @@ export const googleDriveService = {
    */
   async uploadFile(token: string, data: any, fileId?: string): Promise<void> {
     if (fileId) {
-      const response = await fetch(
-        `${UPLOAD_API_URL}/${fileId}?uploadType=media`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+      await googleUploadApi.patch(`/${fileId}`, data, {
+        params: {
+          uploadType: "media",
         },
-      );
-
-      if (!response.ok) throw new Error("Erro ao atualizar arquivo no Drive");
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
     } else {
       const metadata = {
         name: FILE_NAME,
@@ -72,15 +69,14 @@ export const googleDriveService = {
         new Blob([JSON.stringify(data)], { type: "application/json" }),
       );
 
-      const response = await fetch(`${UPLOAD_API_URL}?uploadType=multipart`, {
-        method: "POST",
+      await googleUploadApi.post("", formData, {
+        params: {
+          uploadType: "multipart",
+        },
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
       });
-
-      if (!response.ok) throw new Error("Erro ao criar arquivo no Drive");
     }
   },
 };
