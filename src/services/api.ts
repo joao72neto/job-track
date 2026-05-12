@@ -12,6 +12,25 @@ const injectAuthToken = (config: InternalAxiosRequestConfig) => {
 const createAuthenticatedGoogleApi = (baseURL: string, timeout: number) => {
   const api = axios.create({ baseURL, timeout });
   api.interceptors.request.use(injectAuthToken);
+
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const originalRequest = error.config;
+      const status = error.response?.status;
+
+      if ((status === 401 || status === 403) && !originalRequest._retry) {
+        originalRequest._retry = true;
+        localStorage.removeItem(localStorageKeys.googleToken);
+
+        setTimeout(() => {
+          if (typeof window !== "undefined") window.location.reload();
+        }, 0);
+      }
+
+      return Promise.reject(error);
+    },
+  );
   return api;
 };
 
