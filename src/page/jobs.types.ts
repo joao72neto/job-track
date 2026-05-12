@@ -1,6 +1,7 @@
 export type JobStatus =
   | "Aplicado"
   | "Entrevista"
+  | "Aprovado"
   | "Rejeitado"
   | "Sem resposta";
 

@@ -17,6 +17,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
     "Todos",
     "Aplicado",
     "Entrevista",
+    "Aprovado",
     "Rejeitado",
     "Sem resposta",
   ];

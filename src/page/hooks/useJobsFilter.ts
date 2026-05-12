@@ -36,6 +36,7 @@ export const useJobsFilter = (jobs: Job[]) => {
       Todos: jobs.length,
       Aplicado: 0,
       Entrevista: 0,
+      Aprovado: 0,
       Rejeitado: 0,
       "Sem resposta": 0,
     };

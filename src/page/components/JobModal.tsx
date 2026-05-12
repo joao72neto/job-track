@@ -131,6 +131,7 @@ const JobModal: React.FC<JobModalProps> = ({
         >
           <option value="Aplicado">Aplicado</option>
           <option value="Entrevista">Entrevista</option>
+          <option value="Aprovado">Aprovado</option>
           <option value="Rejeitado">Rejeitado</option>
           <option value="Sem resposta">Sem resposta</option>
         </Input>
