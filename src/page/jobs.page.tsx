@@ -1,7 +1,6 @@
 "use client";
 
 import JobItem from "./components/JobItem";
-import { useEffect } from "react";
 import { autoUpdateJobs } from "./jobs.utils";
 import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
@@ -22,20 +21,13 @@ import Image from "next/image";
 import { useLocalBackup } from "./hooks/useLocalBackup";
 
 const JobsPage = () => {
-  const { isAuthenticated, login, logout, googleToken } = useAuth();
+  const { isAuthenticated, login, logout } = useAuth();
   const { showDanger, showWarning, showSuccess } = useModal();
 
-  const {
-    pushToDrive,
-    pullFromDrive,
-    checkSyncStatus,
-    setIsSynced,
-    isSyncing,
-    isSynced,
-  } = useGoogleDrive();
+  const { jobs, setJobs, addJob, deleteJob, importJobs } = useJobs();
 
-  const { jobs, setJobs, isInitialized, addJob, deleteJob, importJobs } =
-    useJobs(setIsSynced);
+  const { pushToDrive, pullFromDrive, isSyncing, isSynced } =
+    useGoogleDrive(jobs);
 
   const {
     isModalOpen,
@@ -67,12 +59,6 @@ const JobsPage = () => {
     showWarning,
     showDanger,
   });
-
-  useEffect(() => {
-    if (googleToken && isInitialized && jobs.length > 0) {
-      checkSyncStatus(jobs);
-    }
-  }, [googleToken, isInitialized, checkSyncStatus, jobs.length]);
 
   const handleDeleteClick = (id: string) => {
     showDanger({

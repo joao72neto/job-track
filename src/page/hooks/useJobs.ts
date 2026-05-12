@@ -3,7 +3,7 @@ import { Job } from "../jobs.types";
 import { autoUpdateJobs, autoUpdateJobStatus } from "../jobs.utils";
 import { localStorageKeys } from "@/src/localStorage.utils";
 
-export const useJobs = (onSyncChange?: (isSynced: boolean) => void) => {
+export const useJobs = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -26,37 +26,25 @@ export const useJobs = (onSyncChange?: (isSynced: boolean) => void) => {
     localStorage.setItem(localStorageKeys.jobs, JSON.stringify(jobs));
   }, [jobs, isInitialized]);
 
-  const addJob = useCallback(
-    (job: Job, editingJobId?: string) => {
-      const processedJob = autoUpdateJobStatus(job);
-      onSyncChange?.(false);
+  const addJob = useCallback((job: Job, editingJobId?: string) => {
+    const processedJob = autoUpdateJobStatus(job);
 
-      if (editingJobId) {
-        setJobs((prev) =>
-          prev.map((j) => (j.id === editingJobId ? processedJob : j)),
-        );
-      } else {
-        setJobs((prev) => [processedJob, ...prev]);
-      }
-    },
-    [onSyncChange],
-  );
+    if (editingJobId) {
+      setJobs((prev) =>
+        prev.map((j) => (j.id === editingJobId ? processedJob : j)),
+      );
+    } else {
+      setJobs((prev) => [processedJob, ...prev]);
+    }
+  }, []);
 
-  const deleteJob = useCallback(
-    (id: string) => {
-      onSyncChange?.(false);
-      setJobs((prev) => prev.filter((j) => j.id !== id));
-    },
-    [onSyncChange],
-  );
+  const deleteJob = useCallback((id: string) => {
+    setJobs((prev) => prev.filter((j) => j.id !== id));
+  }, []);
 
-  const importJobs = useCallback(
-    (importedJobs: Job[]) => {
-      onSyncChange?.(false);
-      setJobs(autoUpdateJobs(importedJobs));
-    },
-    [onSyncChange],
-  );
+  const importJobs = useCallback((importedJobs: Job[]) => {
+    setJobs(autoUpdateJobs(importedJobs));
+  }, []);
 
   return {
     jobs,

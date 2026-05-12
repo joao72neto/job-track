@@ -1,82 +1,65 @@
-import { useState, useCallback } from "react";
+import { useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { googleDriveService } from "@/src/services/googleDrive.service";
 import { useAuth } from "@/src/contexts/auth.context";
+import { Job } from "../jobs.types";
 
-export const useGoogleDrive = () => {
+export const useGoogleDrive = (localJobs: Job[]) => {
   const { googleToken } = useAuth();
-  const [isSyncing, setIsSyncing] = useState(!!googleToken);
-  const [isSynced, setIsSynced] = useState<boolean | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const checkSyncStatus = useCallback(
-    async (localData: any) => {
-      if (!googleToken) return;
-      setIsSyncing(true);
-      try {
-        const fileId = await googleDriveService.findBackupFile();
-        if (!fileId) {
-          setIsSynced(false);
-          return;
-        }
-        const remoteData = await googleDriveService.downloadFile(fileId);
-        const isSame = JSON.stringify(localData) === JSON.stringify(remoteData);
-        setIsSynced(isSame);
-      } catch (err) {
-        console.error("Erro ao verificar sincronização:", err);
-        setIsSynced(false);
-      } finally {
-        setIsSyncing(false);
-      }
+  const {
+    data: remoteData,
+    isLoading: isFetchingRemote,
+    refetch: refetchRemote,
+  } = useQuery({
+    queryKey: ["google-drive-data"],
+    queryFn: async () => {
+      const fileId = await googleDriveService.findBackupFile();
+      if (!fileId) return null;
+      return await googleDriveService.downloadFile(fileId);
     },
-    [googleToken],
-  );
+    enabled: !!googleToken,
+    retry: 1,
+  });
 
-  const pushToDrive = useCallback(
-    async (data: any) => {
-      if (!googleToken) return;
-      setIsSyncing(true);
-      setError(null);
-      try {
-        const fileId = await googleDriveService.findBackupFile();
-        await googleDriveService.uploadFile(data, fileId || undefined);
-        setIsSynced(true);
-      } catch (err: any) {
-        setError(err.message || "Erro ao enviar dados para o Drive");
-        throw err;
-      } finally {
-        setIsSyncing(false);
-      }
+  const isSynced = useMemo(() => {
+    if (!googleToken || isFetchingRemote) return null;
+    if (!remoteData && localJobs.length === 0) return true;
+    if (!remoteData) return false;
+
+    return JSON.stringify(localJobs) === JSON.stringify(remoteData);
+  }, [localJobs, remoteData, googleToken, isFetchingRemote]);
+
+  const pushMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const fileId = await googleDriveService.findBackupFile();
+      await googleDriveService.uploadFile(data, fileId || undefined);
     },
-    [googleToken],
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["google-drive-data"] });
+    },
+  });
 
-  const pullFromDrive = useCallback(async () => {
-    if (!googleToken) return;
-    setIsSyncing(true);
-    setError(null);
-    try {
+  const pullMutation = useMutation({
+    mutationFn: async () => {
       const fileId = await googleDriveService.findBackupFile();
       if (!fileId) {
         throw new Error("Nenhum backup encontrado no Google Drive.");
       }
-      const data = await googleDriveService.downloadFile(fileId);
-      setIsSynced(true);
-      return data;
-    } catch (err: any) {
-      setError(err.message || "Erro ao baixar dados do Drive");
-      throw err;
-    } finally {
-      setIsSyncing(false);
-    }
-  }, [googleToken]);
+      return await googleDriveService.downloadFile(fileId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["google-drive-data"] });
+    },
+  });
 
   return {
-    pushToDrive,
-    pullFromDrive,
-    checkSyncStatus,
-    setIsSynced,
-    isSyncing,
+    pushToDrive: pushMutation.mutateAsync,
+    pullFromDrive: pullMutation.mutateAsync,
+    checkSyncStatus: refetchRemote,
+    isSyncing:
+      isFetchingRemote || pushMutation.isPending || pullMutation.isPending,
     isSynced,
-    error,
   };
 };
