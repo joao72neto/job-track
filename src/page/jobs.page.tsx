@@ -1,9 +1,8 @@
 "use client";
 
 import JobItem from "./components/JobItem";
-import { useEffect, useMemo, useState } from "react";
-import { Job, JobStatus } from "./jobs.types";
-import { autoUpdateJobs, autoUpdateJobStatus } from "./jobs.utils";
+import { useEffect } from "react";
+import { autoUpdateJobs } from "./jobs.utils";
 import StatusFilter from "./components/StatusFilter";
 import SearchBar from "./components/SearchBar";
 import JobModal from "./components/JobModal";
@@ -12,18 +11,20 @@ import Pagination from "@/src/components/Pagination";
 import GoogleDriveSync from "./components/GoogleDriveSync";
 import { useAuth } from "@/src/contexts/auth.context";
 import { useGoogleDrive } from "./hooks/useGoogleDrive";
+import { useJobs } from "./hooks/useJobs";
+import { useJobsModals } from "./hooks/useJobsModals";
+import { useJobsFilter } from "./hooks/useJobsFilter";
 import { useModal } from "@/src/contexts/modal.context";
 import { HiPlus } from "react-icons/hi";
 
 import Button from "@/src/components/Button";
 import Image from "next/image";
-
-const ITEMS_PER_PAGE = 10;
+import { useLocalBackup } from "./hooks/useLocalBackup";
 
 const JobsPage = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
   const { isAuthenticated, login, logout, googleToken } = useAuth();
+  const { showDanger, showWarning, showSuccess } = useModal();
+
   const {
     pushToDrive,
     pullFromDrive,
@@ -32,99 +33,54 @@ const JobsPage = () => {
     isSyncing,
     isSynced,
   } = useGoogleDrive();
-  const { showDanger, showWarning, showSuccess } = useModal();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [editingJob, setEditingJob] = useState<Job | null>(null);
-  const [viewingJob, setViewingJob] = useState<Job | null>(null);
+  const { jobs, setJobs, isInitialized, addJob, deleteJob, importJobs } =
+    useJobs(setIsSynced);
 
-  const [filterStatus, setFilterStatus] = useState<JobStatus | "Todos">(
-    "Todos",
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    isModalOpen,
+    isViewModalOpen,
+    editingJob,
+    viewingJob,
+    openAddModal,
+    handleEditJob,
+    handleViewJob,
+    closeModal,
+    closeViewModal,
+  } = useJobsModals();
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filterStatus, searchQuery]);
+  const {
+    filterStatus,
+    setFilterStatus,
+    searchQuery,
+    setSearchQuery,
+    currentPage,
+    setCurrentPage,
+    paginatedJobs,
+    totalPages,
+    statusCounts,
+  } = useJobsFilter(jobs);
 
-  useEffect(() => {
-    const savedJobs = localStorage.getItem("jobs");
-    if (savedJobs) {
-      try {
-        const parsedJobs = JSON.parse(savedJobs);
-        const updatedJobs = autoUpdateJobs(parsedJobs);
-        setJobs(updatedJobs);
-      } catch (e) {
-        console.error("Error loading jobs:", e);
-      }
-    }
-    setIsInitialized(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isInitialized) return;
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-  }, [jobs, isInitialized]);
+  const { triggerExport, handleImport } = useLocalBackup({
+    jobs,
+    importJobs,
+    showWarning,
+    showDanger,
+  });
 
   useEffect(() => {
     if (googleToken && isInitialized && jobs.length > 0) {
       checkSyncStatus(jobs);
     }
-  }, [googleToken, isInitialized, checkSyncStatus]);
-
-  const handleAddJob = (job: Job) => {
-    const processedJob = autoUpdateJobStatus(job);
-    if (isSynced) setIsSynced(false);
-
-    if (editingJob) {
-      setJobs(jobs.map((j) => (j.id === processedJob.id ? processedJob : j)));
-    } else {
-      setJobs([processedJob, ...jobs]);
-    }
-    setEditingJob(null);
-  };
-
-  const handleEditJob = (job: Job) => {
-    setEditingJob(job);
-    setIsModalOpen(true);
-  };
-
-  const handleViewJob = (job: Job) => {
-    setViewingJob(job);
-    setIsViewModalOpen(true);
-  };
+  }, [googleToken, isInitialized, checkSyncStatus, jobs.length]);
 
   const handleDeleteClick = (id: string) => {
     showDanger({
       title: "Excluir Vaga",
       message:
         "Tem certeza que deseja excluir esta vaga? Esta ação não poderá ser desfeita.",
-      onConfirm: () => {
-        if (isSynced) setIsSynced(false);
-        setJobs((prev) => prev.filter((j) => j.id !== id));
-      },
+      onConfirm: () => deleteJob(id),
     });
-  };
-
-  const openAddModal = () => {
-    setEditingJob(null);
-    setIsModalOpen(true);
-  };
-
-  const triggerExport = () => {
-    const dataStr = JSON.stringify(jobs, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-    const exportFileDefaultName = `job-track-backup-${
-      new Date().toISOString().split("T")[0]
-    }.json`;
-
-    const linkElement = document.createElement("a");
-    linkElement.setAttribute("href", dataUri);
-    linkElement.setAttribute("download", exportFileDefaultName);
-    linkElement.click();
   };
 
   const handleExportClick = () => {
@@ -135,42 +91,6 @@ const JobsPage = () => {
       onConfirm: triggerExport,
       confirmText: "Exportar",
     });
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const importedJobs = JSON.parse(content);
-        if (Array.isArray(importedJobs)) {
-          showWarning({
-            title: "Importar Dados",
-            message:
-              "Deseja substituir todas as vagas atuais pelas do arquivo importado? Esta ação sobrescreverá seus dados locais.",
-            onConfirm: () => {
-              if (isSynced) setIsSynced(false);
-              setJobs(autoUpdateJobs(importedJobs));
-            },
-            confirmText: "Importar",
-          });
-        } else {
-          showDanger({
-            title: "Erro na Importação",
-            message:
-              "Arquivo JSON inválido. Certifique-se de que é uma lista de vagas.",
-          });
-        }
-      } catch (err) {
-        console.error("Erro ao importar JSON:", err);
-        alert("Erro ao ler o arquivo JSON.");
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = "";
   };
 
   const handlePush = async () => {
@@ -212,39 +132,6 @@ const JobsPage = () => {
       },
     });
   };
-
-  const filteredJobs = jobs.filter((job) => {
-    const matchesStatus =
-      filterStatus === "Todos" || job.status === filterStatus;
-    const matchesSearch = job.company
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
-  const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
-
-  const statusCounts = useMemo(() => {
-    const counts = {
-      Todos: jobs.length,
-      Aplicado: 0,
-      Entrevista: 0,
-      Rejeitado: 0,
-      "Sem resposta": 0,
-    };
-
-    jobs.forEach((job) => {
-      if (counts[job.status] !== undefined) {
-        counts[job.status]++;
-      }
-    });
-
-    return counts;
-  }, [jobs]);
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
@@ -344,14 +231,14 @@ const JobsPage = () => {
 
       <JobModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleAddJob}
+        onClose={closeModal}
+        onSave={(job) => addJob(job, editingJob?.id)}
         editingJob={editingJob}
       />
 
       <JobViewModal
         isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
+        onClose={closeViewModal}
         job={viewingJob}
       />
     </main>
