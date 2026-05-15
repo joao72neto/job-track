@@ -40,4 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# PWA / Serwist
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+
 GEMINI.md
