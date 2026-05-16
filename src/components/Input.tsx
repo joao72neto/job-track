@@ -8,7 +8,7 @@ const baseClasses = clsx(
 );
 
 const errorClasses =
-  "border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-500";
+  "border-red-500 focus:border-red-500 focus:ring-0! dark:border-red-500 animate-shake";
 
 interface InputProps extends ComponentPropsWithRef<"input"> {
   label?: string;
