@@ -3,6 +3,7 @@ import { Job } from "../jobs.types";
 import ModalContainer from "@/src/components/modals/ModalContainer";
 import Button from "@/src/components/Button";
 import { clsx } from "clsx";
+import { format } from "date-fns";
 
 interface JobViewModalProps {
   job: Job | null;
@@ -66,7 +67,9 @@ const JobViewModal: React.FC<JobViewModalProps> = ({
             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Data de Candidatura
             </label>
-            <p className="mt-1 text-gray-900 dark:text-white">{job.date}</p>
+            <p className="mt-1 text-gray-900 dark:text-white">
+              {format(job.date, "dd/MM/yyyy")}
+            </p>
           </div>
           {job.link && (
             <div>
@@ -77,7 +80,7 @@ const JobViewModal: React.FC<JobViewModalProps> = ({
                 href={job.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 block break-all text-blue-600 hover:underline dark:text-blue-400"
+                className="mt-1 block truncate text-blue-600 hover:underline dark:text-blue-400"
               >
                 {job.link}
               </a>
