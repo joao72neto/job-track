@@ -15,8 +15,7 @@ export const jobSchema = yup.object().shape({
   platform: yup.string().trim().required("Plataforma obrigatória"),
 
   date: yup
-    .date()
-    .typeError("Formato de data inválido")
+    .string()
     .required("Data obrigatória"),
 
   link: yup

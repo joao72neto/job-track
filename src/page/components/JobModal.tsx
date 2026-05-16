@@ -6,6 +6,7 @@ import { jobSchema, JobForm } from "../jobs.schema";
 import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import ModalContainer from "@/src/components/modals/ModalContainer";
+import { format } from "date-fns";
 
 interface JobModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ const JobModal: React.FC<JobModalProps> = ({
       company: "",
       role: "",
       platform: "",
-      date: new Date(),
+      date: format(new Date(), "yyyy-MM-dd"),
       status: "Aplicado",
       notes: "",
       link: "",
@@ -43,7 +44,7 @@ const JobModal: React.FC<JobModalProps> = ({
     if (editingJob) {
       reset({
         ...editingJob,
-        date: new Date(editingJob.date),
+        date: editingJob.date,
         link: editingJob.link || "",
         notes: editingJob.notes || "",
       });
@@ -52,7 +53,7 @@ const JobModal: React.FC<JobModalProps> = ({
         company: "",
         role: "",
         platform: "",
-        date: new Date(),
+        date: format(new Date(), "yyyy-MM-dd"),
         status: "Aplicado",
         notes: "",
         link: "",
@@ -66,7 +67,6 @@ const JobModal: React.FC<JobModalProps> = ({
     onSave({
       ...data,
       id: editingJob?.id || crypto.randomUUID(),
-      date: data.date.toISOString().split("T")[0],
       link: data.link || undefined,
       notes: data.notes || "",
     } as Job);
