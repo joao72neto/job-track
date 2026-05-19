@@ -80,18 +80,25 @@ const JobsPage = () => {
   };
 
   const handlePush = async () => {
-    try {
-      await pushToDrive(jobs);
-      showSuccess({
-        title: "Backup Concluído",
-        message: "Seus dados foram salvos com sucesso no Google Drive!",
-      });
-    } catch (err: any) {
-      showDanger({
-        title: "Erro no Backup",
-        message: err.message,
-      });
-    }
+    showWarning({
+      title: "Backup de Dados",
+      message:
+        "Deseja enviar os seus dados para o Google Drive? Isso sobrescreverá os dados atuais na nuvem.",
+      onConfirm: async () => {
+        try {
+          await pushToDrive(jobs);
+          showSuccess({
+            title: "Backup Concluído",
+            message: "Seus dados foram salvos com sucesso no Google Drive!",
+          });
+        } catch (err: any) {
+          showDanger({
+            title: "Erro no Backup",
+            message: err.message,
+          });
+        }
+      },
+    });
   };
 
   const handlePull = async () => {
