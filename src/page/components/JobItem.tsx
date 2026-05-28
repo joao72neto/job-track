@@ -2,6 +2,7 @@ import React from "react";
 import { Job } from "../jobs.types";
 import { clsx } from "clsx";
 import { HiExternalLink, HiPencil, HiTrash } from "react-icons/hi";
+import { format } from "date-fns";
 
 interface JobItemProps {
   job: Job;
@@ -62,7 +63,9 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
       </div>
 
       <div className="hidden lg:block">
-        <p className="text-sm text-gray-500 dark:text-gray-400">{job.date}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {format(job.date, "dd/MM/yyyy")}
+        </p>
       </div>
 
       <div className="flex items-center sm:justify-start">
