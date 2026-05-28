@@ -7,17 +7,20 @@ import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import ModalContainer from "@/src/components/modals/ModalContainer";
 import { format } from "date-fns";
+import { useModal } from "@/src/contexts/modal.context";
 
 interface JobModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  close: () => void;
+  open: () => void;
   onSave: (job: Job) => void;
   editingJob?: Job | null;
 }
 
 const JobModal: React.FC<JobModalProps> = ({
   isOpen,
-  onClose,
+  close,
+  open,
   onSave,
   editingJob,
 }) => {
@@ -25,7 +28,7 @@ const JobModal: React.FC<JobModalProps> = ({
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<JobForm>({
     resolver: yupResolver(jobSchema),
     mode: "onChange",
@@ -40,28 +43,50 @@ const JobModal: React.FC<JobModalProps> = ({
     },
   });
 
+  const { showWarning, hideModal } = useModal();
+
   useEffect(() => {
-    if (editingJob) {
-      reset({
-        ...editingJob,
-        date: editingJob.date,
-        link: editingJob.link || "",
-        notes: editingJob.notes || "",
-      });
-    } else {
-      reset({
-        company: "",
-        role: "",
-        platform: "",
-        date: format(new Date(), "yyyy-MM-dd"),
-        status: "Aplicado",
-        notes: "",
-        link: "",
-      });
+    if (isOpen) {
+      if (editingJob) {
+        reset({
+          ...editingJob,
+          date: editingJob.date,
+          link: editingJob.link || "",
+          notes: editingJob.notes || "",
+        });
+      } else {
+        reset({
+          company: "",
+          role: "",
+          platform: "",
+          date: format(new Date(), "yyyy-MM-dd"),
+          status: "Aplicado",
+          notes: "",
+          link: "",
+        });
+      }
     }
   }, [editingJob, isOpen, reset]);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    if (isDirty) {
+      showWarning({
+        title: "Alterações não salvas",
+        message: "Você tem alterações não salvas. Deseja realmente sair?",
+        onConfirm: () => {
+          close();
+          reset();
+        },
+        confirmText: "Sim",
+        cancelText: "Não",
+        onCancel: hideModal,
+      });
+    } else {
+      close();
+    }
+  };
 
   const onSubmit = (data: JobForm) => {
     onSave({
@@ -70,11 +95,11 @@ const JobModal: React.FC<JobModalProps> = ({
       link: data.link || undefined,
       notes: data.notes || "",
     } as Job);
-    onClose();
+    close();
   };
 
   return (
-    <ModalContainer close={onClose} size="sm">
+    <ModalContainer close={handleClose} size="sm">
       <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
         {editingJob ? "Editar Vaga" : "Adicionar Nova Vaga"}
       </h2>
@@ -132,7 +157,7 @@ const JobModal: React.FC<JobModalProps> = ({
           {...register("notes")}
         />
         <div className="mt-6 flex justify-end space-x-3">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={handleClose}>
             Cancelar
           </Button>
           <Button type="submit">Salvar</Button>

@@ -23,6 +23,7 @@ export const useJobsModals = () => {
   };
 
   const closeModal = () => setIsModalOpen(false);
+  const openModal = () => setIsModalOpen(true);
   const closeViewModal = () => setIsViewModalOpen(false);
 
   return {
@@ -34,6 +35,7 @@ export const useJobsModals = () => {
     handleEditJob,
     handleViewJob,
     closeModal,
+    openModal,
     closeViewModal,
   };
 };

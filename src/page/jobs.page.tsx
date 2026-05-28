@@ -38,6 +38,7 @@ const JobsPage = () => {
     handleEditJob,
     handleViewJob,
     closeModal,
+    openModal,
     closeViewModal,
   } = useJobsModals();
 
@@ -224,7 +225,8 @@ const JobsPage = () => {
 
       <JobModal
         isOpen={isModalOpen}
-        onClose={closeModal}
+        close={closeModal}
+        open={openModal}
         onSave={(job) => addJob(job, editingJob?.id)}
         editingJob={editingJob}
       />

@@ -15,6 +15,7 @@ interface ShowModalProps {
   title: string;
   message: string;
   onConfirm?: () => void;
+  onCancel?: () => void;
   confirmText?: string;
   cancelText?: string;
 }
@@ -69,7 +70,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
       {children}
       <ConfirmationModal
         isOpen={isOpen}
-        onClose={hideModal}
+        onClose={modalProps.onCancel || hideModal}
         variant={modalProps.variant}
         title={modalProps.title}
         message={modalProps.message}
