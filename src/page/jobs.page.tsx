@@ -128,7 +128,7 @@ const JobsPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 md:p-8 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-100 px-4 py-8 md:px-8 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="flex gap-3 items-center text-3xl font-bold text-gray-900 dark:text-white min-w-50">

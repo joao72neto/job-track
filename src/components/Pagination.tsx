@@ -40,7 +40,7 @@ const Pagination: React.FC<PaginationProps> = ({
         variant="secondary"
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
-        className="w-13 shrink-0 px-2!"
+        className="w-10 sm:w-13 shrink-0 px-2!"
         aria-label="Página anterior"
         size="sm"
       >
@@ -54,7 +54,7 @@ const Pagination: React.FC<PaginationProps> = ({
             variant={currentPage === page ? "primary" : "secondary"}
             onClick={() => onPageChange(page)}
             className={clsx(
-              "min-w-10 shrink-0",
+              "w-10 sm:w-13 shrink-0",
               currentPage === page && "pointer-events-none",
             )}
             size="sm"
@@ -69,7 +69,7 @@ const Pagination: React.FC<PaginationProps> = ({
         variant="secondary"
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
-        className="w-13 shrink-0 px-2!"
+        className="w-10 sm:w-13 shrink-0 px-2!"
         aria-label="Próxima página"
         size="sm"
       >
