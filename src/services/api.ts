@@ -23,9 +23,11 @@ const createAuthenticatedGoogleApi = (baseURL: string, timeout: number) => {
         originalRequest._retry = true;
         localStorage.removeItem(localStorageKeys.googleToken);
 
-        setTimeout(() => {
-          if (typeof window !== "undefined") window.location.reload();
-        }, 0);
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
+
+        return new Promise(() => {});
       }
 
       return Promise.reject(error);
