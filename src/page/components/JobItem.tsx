@@ -82,7 +82,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onEdit, onDelete, onView }) => {
       <div
         className={clsx(
           "flex items-center justify-end gap-1 border-t pt-3 space-x-3 sm:space-x-0 sm:border-t-0 sm:pt-0",
-          "dark:border-gray-700 sm:w-25",
+          "dark:border-gray-700 border-black/20 sm:w-25",
         )}
       >
         {job.link && (
