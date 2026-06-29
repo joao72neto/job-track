@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { googleDriveService } from "@/src/services/googleDrive.service";
 import { useAuth } from "@/src/contexts/auth.context";
@@ -10,7 +10,7 @@ export const useGoogleDrive = (localJobs: Job[]) => {
 
   const {
     data: remoteData,
-    isLoading: isFetchingRemote,
+    isFetching: isFetchingRemote,
     refetch: refetchRemote,
   } = useQuery({
     queryKey: ["google-drive-data"],
