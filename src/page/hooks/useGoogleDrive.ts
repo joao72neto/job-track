@@ -4,6 +4,8 @@ import { googleDriveService } from "@/src/services/googleDrive.service";
 import { useAuth } from "@/src/contexts/auth.context";
 import { Job } from "../jobs.types";
 
+import isEqual from "lodash/isEqual";
+
 export const useGoogleDrive = (localJobs: Job[]) => {
   const { googleToken } = useAuth();
   const queryClient = useQueryClient();
@@ -28,7 +30,19 @@ export const useGoogleDrive = (localJobs: Job[]) => {
     if (!remoteData && localJobs.length === 0) return true;
     if (!remoteData) return false;
 
-    return JSON.stringify(localJobs) === JSON.stringify(remoteData);
+    const normalize = (jobs: Job[]) =>
+      [...jobs]
+        .map((job) => ({
+          id: job.id,
+          company: job.company,
+          platform: job.platform,
+          date: job.date,
+          status: job.status,
+          notes: job.notes,
+        }))
+        .sort((a, b) => a.id.localeCompare(b.id));
+
+    return isEqual(normalize(localJobs), normalize(remoteData ?? []));
   }, [localJobs, remoteData, googleToken, isFetchingRemote]);
 
   const pushMutation = useMutation({
